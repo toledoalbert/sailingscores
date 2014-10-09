@@ -38,6 +38,29 @@ class Regatta():
          'teams': self.teams
       }
 
+# class Rotation():
+#    'Class that represents the rotation of a team in a Regatta'
+
+#    def __init__(self, regattaURL, teamName):
+#       self.regattaURL = regattaURL
+#       self.teamName = teamName
+#       self.rotation = []
+
+#       r = requests.get(regattaURL + "rotations")
+
+#       data = r.text
+
+#       soup = BeautifulSoup(data)
+
+#       table = soup.find_all('tbody')
+
+#       if table:
+#          for row in table:
+#             for col in row.find_all("td", {"class": "teamname"}):
+#                if self.teamName == col.text:
+#                   col.next_sibling
+
+
 class Moment():
    'Class that represent any given moment'
 
