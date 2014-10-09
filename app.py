@@ -21,5 +21,9 @@ def get_regattas():
 	# print m.to_json()
 	return jsonify(m.to_json())
 
+@app.route('/rotations', methods=['GET'])
+def get_rotations():
+	
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -24,7 +24,7 @@ class Regatta():
       if table:
          for row in table:
             for col in row.find_all("td", {"class" : "teamname"}):
-               self.teams.append(col.text)
+               self.teams.append({'name': col.text, 'rotation':[], 'scores':[]})
       else:
          self.teams.append("Teams not available")
 
