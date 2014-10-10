@@ -23,7 +23,6 @@ def get_regattas():
 
 @app.route('/rotations', methods=['GET'])
 def get_rotations():
-
 	rotations = []
 
 	r = requests.get("http://scores.collegesailing.org/f14/tom-curtis/rotations/")
@@ -42,12 +41,8 @@ def get_rotations():
 		teamNames = []
 
 		for teamName in rotationTable.find_all(class_='teamname'):
-		    teamNames.append(teamName.text)
-
-		# t = rotationTable.find('tbody')
-	   
+			teamNames.append(teamName.text)
 		divName = rotationTable.find('h3').text
-		print divName
 
 		r = Rotation(divName)
 
@@ -59,20 +54,19 @@ def get_rotations():
 			countRaces = 0
 
 			rotTeam = RotationTeam(teamNames[countTeams])
-			for race in  row.find_all(class_='sail'):
+
+			for race in row.find_all(class_='sail'):
 				teamRace = Race(raceNames[countRaces], race.text)
 				rotTeam.races.append(teamRace.to_json())
 				if countRaces < raceNames.__len__():
 					countRaces = countRaces + 1
 			r.teams.append(rotTeam.to_json())
-			# print rotTeam.to_json()
+
 			if countTeams < teamNames.__len__():
 				countTeams = countTeams + 1
-
 		rotations.append(r.to_json())
-	print rotations
-	return jsonify(rotations)
-
+	response = {'rotations': rotations}
+	return jsonify(response)
 
 
 if __name__ == '__main__':
