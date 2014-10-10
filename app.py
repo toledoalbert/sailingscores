@@ -5,7 +5,7 @@ import json
 from bs4 import BeautifulSoup
 import requests
 # from Regatta import Regatta
-from models import Moment
+from models import *
 
 app = Flask(__name__)
 
@@ -24,50 +24,54 @@ def get_regattas():
 @app.route('/rotations', methods=['GET'])
 def get_rotations():
 
+	rotations = []
+
 	r = requests.get("http://scores.collegesailing.org/f14/tom-curtis/rotations/")
 	data = r.text
 	soup = BeautifulSoup(data)
 
 	for rotationTable in soup.find_all(class_='port'):
-	   raceNames = []
-	   head = rotationTable.find('thead')
+		raceNames = []
+		head = rotationTable.find('thead')
 
-	   for raceName in head.find_all('th'):
-	      raceNames.append(raceName.text)
-	   raceNames.pop(0)
-	   raceNames.pop(0)
+		for raceName in head.find_all('th'):
+			raceNames.append(raceName.text)
+		raceNames.pop(0)
+		raceNames.pop(0)
 
-	   teamNames = []
+		teamNames = []
 
-	   for teamName in rotationTable.find_all(class_='teamname'):
-	      teamNames.append(teamName.text)
+		for teamName in rotationTable.find_all(class_='teamname'):
+		    teamNames.append(teamName.text)
+
+		# t = rotationTable.find('tbody')
 	   
-	   divName = rotationTable.find('h3').text
+		divName = rotationTable.find('h3').text
+		print divName
 
-	   r = Rotation(divName)
+		r = Rotation(divName)
 
-	   t = rotationTable.find('tbody')
+		t = rotationTable.find('tbody')
 
-	   countTeams = 0
+		countTeams = 0
 
-	   for row in t.find_all('tr'):
-	      # print countTeams
-	      countRaces = 0
-	      # print countTeams
-	      rotTeam = RotationTeam(teamNames[countTeams])
-	      for race in  row.find_all(class_='sail'):
-	         teamRace = Race(raceNames[countRaces], race.text)
-	         rotTeam.races.append(teamRace.to_json())
-	         if countRaces < raceNames.__len__():
-	            countRaces = countRaces + 1
-	      r.teams.append(rotTeam.to_json())
-	      # print rotTeam.to_json()
-	      if countTeams < teamNames.__len__():
-	         countTeams = countTeams + 1
+		for row in t.find_all('tr'):
+			countRaces = 0
 
-	   return jsonify(r.to_json())
-	   # print raceNames
-	   # print teamNames
+			rotTeam = RotationTeam(teamNames[countTeams])
+			for race in  row.find_all(class_='sail'):
+				teamRace = Race(raceNames[countRaces], race.text)
+				rotTeam.races.append(teamRace.to_json())
+				if countRaces < raceNames.__len__():
+					countRaces = countRaces + 1
+			r.teams.append(rotTeam.to_json())
+			# print rotTeam.to_json()
+			if countTeams < teamNames.__len__():
+				countTeams = countTeams + 1
+
+		rotations.append(r.to_json())
+	print rotations
+	return jsonify(rotations)
 
 
 
