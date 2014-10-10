@@ -38,27 +38,52 @@ class Regatta():
          'teams': self.teams
       }
 
-# class Rotation():
-#    'Class that represents the rotation of a team in a Regatta'
 
-#    def __init__(self, regattaURL, teamName):
-#       self.regattaURL = regattaURL
-#       self.teamName = teamName
-#       self.rotation = []
 
-#       r = requests.get(regattaURL + "rotations")
+class Rotation():
+   'Class that represents the rotation of a team in a Regatta'
 
-#       data = r.text
+   def __init__(self, divName):
+      self.divName = divName
+      self.teams = []
 
-#       soup = BeautifulSoup(data)
+   def to_json(self):
+      return {
+         'division': self.divName,
+         'teams': self.teams
+      }
 
-#       table = soup.find_all('tbody')
 
-#       if table:
-#          for row in table:
-#             for col in row.find_all("td", {"class": "teamname"}):
-#                if self.teamName == col.text:
-#                   col.next_sibling
+
+class RotationTeam():
+   'Class that represents a rotation for a single team in a regatta'
+
+   def __init__(self, teamName):
+      self.teamName = teamName
+      self.races = []
+
+   def to_json(self):
+      return {
+         'name': self.teamName,
+         'races': self.races
+      }
+
+
+
+class Race():
+   'Class that represents a race for a rotation or score table'
+
+   def __init__(self, name, value):
+      self.name = name
+      self.value = value
+
+   def to_json(self):
+      return {
+         'name': self.name,
+         'value': self.value
+      }
+
+
 
 
 class Moment():
@@ -101,4 +126,49 @@ class Moment():
          'regattas': self.regattas
       }
 
+
+r = requests.get("http://scores.collegesailing.org/f14/tom-curtis/rotations/")
+data = r.text
+soup = BeautifulSoup(data)
+
+for rotationTable in soup.find_all(class_='port'):
+   raceNames = []
+   head = rotationTable.find('thead')
+
+   for raceName in head.find_all('th'):
+      raceNames.append(raceName.text)
+   raceNames.pop(0)
+   raceNames.pop(0)
+
+   teamNames = []
+
+   for teamName in rotationTable.find_all(class_='teamname'):
+      teamNames.append(teamName.text)
+   
+   divName = rotationTable.find('h3').text
+
+   r = Rotation(divName)
+
+   t = rotationTable.find('tbody')
+
+   countTeams = 0
+
+   for row in t.find_all('tr'):
+      # print countTeams
+      countRaces = 0
+      # print countTeams
+      rotTeam = RotationTeam(teamNames[countTeams])
+      for race in  row.find_all(class_='sail'):
+         teamRace = Race(raceNames[countRaces], race.text)
+         rotTeam.races.append(teamRace.to_json())
+         if countRaces < raceNames.__len__():
+            countRaces = countRaces + 1
+      r.teams.append(rotTeam.to_json())
+      # print rotTeam.to_json()
+      if countTeams < teamNames.__len__():
+         countTeams = countTeams + 1
+
+   print r.to_json()
+   # print raceNames
+   # print teamNames
 
