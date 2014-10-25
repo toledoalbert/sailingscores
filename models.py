@@ -21,14 +21,29 @@ class Regatta():
 
       soup = BeautifulSoup(data)
 
-      table = soup.find_all('tbody')
+      table = soup.find('tbody')
 
       if table:
-         for t in table:
-            for d in row.find_all("tr"):
-               info = d.find_all("td")
-               # self.teams.append({'name': col.text, 'rotation':[], 'scores':[]})
-               self.teams.append({'name': info[3] })
+         rows = table.find_all("tr")
+         for row in rows:
+            order = 0
+            school = ""
+            teamname = ""
+            totalScore = "N/A"
+            cols = row.find_all("td")
+            for col in cols:
+               if order == 3:
+                  school = col.text
+               elif order == 4:
+                  teamname = col.text
+               elif order == 9:
+                  totalScore = col.text
+            # self.teams.append({'name': cols[0]})
+               order = order + 1
+            self.teams.append({'name': teamname, 'school': school, 'score': totalScore})
+            # for col in cols:
+            #    # self.teams.append({'name': col.text})
+            #    self.teams.append({'name': col.text})
       else:
          self.teams.append("Teams not available")
 
