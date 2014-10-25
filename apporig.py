@@ -24,6 +24,7 @@ def get_regattas():
 @app.route('/rotations/<regatta>', methods=['GET'])
 def get_rotations(regatta):
 	rotations = []
+
 	r = requests.get("http://scores.collegesailing.org/f14/" + regatta + "/rotations/")
 	data = r.text
 	soup = BeautifulSoup(data)
@@ -31,12 +32,9 @@ def get_rotations(regatta):
 	for rotationTable in soup.find_all(class_='port'):
 		raceNames = []
 		head = rotationTable.find('thead')
-		
-		if head == None:
-			continue 
-		else:
-			for raceName in head.find_all('th'):
-				raceNames.append(raceName.text)
+
+		for raceName in head.find_all('th'):
+			raceNames.append(raceName.text)
 		raceNames.pop(0)
 		raceNames.pop(0)
 
@@ -69,59 +67,6 @@ def get_rotations(regatta):
 		rotations.append(r.to_json())
 	response = {'rotations': rotations}
 	return jsonify(response)
-
-
-
-@app.route('/rotations/<regatta>/<teamname>', methods=['GET'])
-def get_SpecRotations(regatta,teamname):
-	rotations = []
-	r = requests.get("http://scores.collegesailing.org/f14/" + regatta + "/rotations/")
-	data = r.text
-	soup = BeautifulSoup(data)
-
-	for rotationTable in soup.find_all(class_='port'):
-		raceNames = []
-		head = rotationTable.find('thead')
-		
-		if head == None:
-			continue 
-		else:
-			for raceName in head.find_all('th'):
-				raceNames.append(raceName.text)
-		raceNames.pop(0)
-		raceNames.pop(0)
-
-		divName = rotationTable.find('h3').text
-
-		r = Rotation(divName)
-
-		t = rotationTable.find('tbody')
-
-		countTeams = 0
-
-		for row in t.find_all('tr'):
-			for name in row.find_all(class_='teamname'):
-				if teamname in name.text.lower():
-					countRaces = 0
-
-					rotTeam = RotationTeam(teamname)
-
-					for race in row.find_all(class_='sail'):
-						teamRace = Race(raceNames[countRaces], race.text)
-						rotTeam.races.append(teamRace.to_json())
-						if countRaces < raceNames.__len__():
-							countRaces = countRaces + 1
-					r.teams.append(rotTeam.to_json())	
-		rotations.append(r.to_json())
-	response = {'rotations': rotations}
-	return jsonify(response)
-	
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
