@@ -9,7 +9,6 @@ Werkzeug==0.9.6
 altgraph==0.10.1
 bdist-mpkg==0.4.4
 beautifulsoup4==4.3.2
-bonjour-py==0.3
 geopy==1.1.5
 itsdangerous==0.24
 macholib==1.5
