@@ -15,7 +15,7 @@ class Regatta():
       tmp = link.split("/")
       self.label = tmp[tmp.__len__()-2]
 
-      r = requests.get(link + "rotations")
+      r = requests.get(link) #+ "rotations")
 
       data = r.text
 
@@ -24,9 +24,11 @@ class Regatta():
       table = soup.find_all('tbody')
 
       if table:
-         for row in table:
-            for col in row.find_all("td", {"class" : "teamname"}):
-               self.teams.append({'name': col.text, 'rotation':[], 'scores':[]})
+         for t in table:
+            for d in row.find_all("tr"):
+               info = d.find_all("td")
+               # self.teams.append({'name': col.text, 'rotation':[], 'scores':[]})
+               self.teams.append({'name': info[3] })
       else:
          self.teams.append("Teams not available")
 
@@ -36,7 +38,7 @@ class Regatta():
       return {
          'name': self.name,
          'label': self.label,
-         'host': self.host,
+         # 'host': self.host,
          'link': self.link,
          'teams': self.teams
       }
